@@ -60,11 +60,11 @@ def one_percent():
     #   ORDER BY date2
     cursor.execute('''
         SELECT date1,
-          (CAST(num2 AS decimal)  / CAST(num1+num2 AS decimal))*100 AS num_tot
+          round((num2::decimal  / (num1+num2)::decimal)*100, 2) || '%' AS num_tot
           FROM ok_status
           JOIN not_ok
           ON date1 = date2
-          WHERE (CAST(num2 AS decimal)  / CAST(num1+num2 AS decimal))*100 > 1;
+          WHERE (num2::decimal  / (num1+num2)::decimal)*100 > 1;
           ''')
     return cursor.fetchall()
     db.close()
