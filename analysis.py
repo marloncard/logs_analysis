@@ -4,6 +4,10 @@ import psycopg2
 
 DBNAME = "news"
 
+def main():
+    output = top_three()
+    output = top_author()
+    output = one_percent()
 
 def top_three():
     db = psycopg2.connect(database=DBNAME)
@@ -55,7 +59,7 @@ def one_percent():
     #   GROUP BY date2
     #   ORDER BY date2
     cursor.execute('''
-        SELECT date1, num1, num2,
+        SELECT date1,
           (CAST(num2 AS decimal)  / CAST(num1+num2 AS decimal))*100 AS num_tot
           FROM ok_status
           JOIN not_ok
@@ -67,7 +71,7 @@ def one_percent():
 
 def format_output(arg1):
     for item in output:
-        print(str(item[0]) + ' - ' + str(item[3]))
+        print(str(item[0]) + ' - ' + str(item[1]))
 
 
 output = one_percent()
