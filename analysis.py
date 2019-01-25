@@ -5,14 +5,14 @@ import psycopg2
 DBNAME = "news"
 
 def main():
-    output = top_three()
-    output = top_author()
-    output = one_percent()
+    format_output(top_three())
+    format_output(top_author())
+    format_output(one_percent())
 
 def top_three():
     db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
-    # 1. What are the most popular three articles of all time?
+    query_question = "1. What are the most popular three articles of all time?"
     cursor.execute('''
         SELECT articles.title, count(log.path) as num
         FROM articles
@@ -22,13 +22,13 @@ def top_three():
         ORDER BY num DESC
         LIMIT 3;
         ''')
-    return cursor.fetchall()
+    return (cursor.fetchall(), query_question)
     db.close()
 
 def top_author():
     db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
-    # 2. What are the most popular article authors of all time?
+    query_question = "2. What are the most popular article authors of all time?"
     cursor.execute('''
         SELECT authors.name, count(log.path) as num
         FROM authors
@@ -39,13 +39,14 @@ def top_author():
         GROUP BY authors.name
         ORDER BY num DESC;
         ''')
-    return cursor.fetchall()
+    return (cursor.fetchall(), query_question)
     db.close()
 
 def one_percent():
     db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
-    # 3. On which days did more than 1% of requests lead to errors?
+    query_question = "3. On which days did more than 1% of requests lead to errors?"
+    ### VIEWS ###
     # CREATE VIEW ok_status AS
     #   SELECT DATE(time) as date1, count(path) as num1
     #   FROM log
@@ -66,14 +67,15 @@ def one_percent():
           ON date1 = date2
           WHERE (num2::decimal  / (num1+num2)::decimal)*100 > 1;
           ''')
-    return cursor.fetchall()
+    return (cursor.fetchall(), query_question)
     db.close()
 
-def format_output(arg1):
-    for item in output:
+def format_output((arg1, arg2)):
+    print(arg2)
+    print("=" * 30)
+    for item in arg1:
         print(str(item[0]) + ' - ' + str(item[1]))
+    print("\n\n\n")
 
-
-output = one_percent()
-print("What are the most popular three articles of all time?\n" + "=" * 30)
-format_output(output)
+if __name__ == "__main__":
+    main()
