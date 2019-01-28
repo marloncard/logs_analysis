@@ -1,20 +1,22 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python2
 import psycopg2
 
 
 DBNAME = "news"
 
-def main():
-    format_output(top_three())
-    format_output(top_author())
-    format_output(one_percent())
 
-def top_three():
+def main():
+    format_output(topThree())
+    format_output(topAuthor())
+    format_output(onePercent())
+
+
+def topThree():
     db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
     query_question = "1. What are the most popular three articles of all time?"
     cursor.execute('''
-        SELECT articles.title, count(log.path) as num
+        SELECT articles.title, count(log.path) || ' views' as num
         FROM articles
         JOIN log
         ON log.path LIKE '%' || articles.slug || '%'
@@ -25,12 +27,14 @@ def top_three():
     return (cursor.fetchall(), query_question)
     db.close()
 
-def top_author():
+
+def topAuthor():
     db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
-    query_question = "2. What are the most popular article authors of all time?"
+    query_question = '''2. What are the most popular article authors of all
+    time?'''
     cursor.execute('''
-        SELECT authors.name, count(log.path) as num
+        SELECT authors.name, count(log.path) || ' views' as num
         FROM authors
         JOIN articles
         ON authors.id = articles.author
@@ -42,11 +46,13 @@ def top_author():
     return (cursor.fetchall(), query_question)
     db.close()
 
-def one_percent():
+
+def onePercent():
     db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
-    query_question = "3. On which days did more than 1% of requests lead to errors?"
-    ### VIEWS ###
+    query_question = '''3. On which days did more than 1% of requests lead to
+    errors?'''
+    # DATABASE VIEWS #
     # CREATE VIEW ok_status AS
     #   SELECT DATE(time) as date1, count(path) as num1
     #   FROM log
@@ -60,22 +66,26 @@ def one_percent():
     #   GROUP BY date2
     #   ORDER BY date2
     cursor.execute('''
-        SELECT date1,
-          round((num2::decimal  / (num1+num2)::decimal)*100, 2) || '%' AS num_tot
+        SELECT to_char(date1, 'FMMonth DD, YYYY'),
+          round((num2::decimal  / (num1+num2)::decimal)*100, 2) || '% errors'
+          AS num_tot
           FROM ok_status
           JOIN not_ok
           ON date1 = date2
           WHERE (num2::decimal  / (num1+num2)::decimal)*100 > 1;
-          ''')
+         ''')
     return (cursor.fetchall(), query_question)
     db.close()
 
+
 def format_output((arg1, arg2)):
     print(arg2)
-    print("=" * 30)
+    print("=" * len(arg2))
     for item in arg1:
         print(str(item[0]) + ' - ' + str(item[1]))
-    print("\n\n\n")
+    print("=" * len(arg2))
+    print("\n\n")
+
 
 if __name__ == "__main__":
     main()
