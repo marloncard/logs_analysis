@@ -39,9 +39,9 @@ def topAuthor():
         JOIN articles
         ON authors.id = articles.author
         JOIN log
-        ON log.path LIKE '%' || articles.slug || '%'
+        ON log.path LIKE '%' || articles.slug
         GROUP BY authors.name
-        ORDER BY num DESC;
+        ORDER BY count(log.path) DESC;
         ''')
     return (cursor.fetchall(), query_question)
     db.close()
