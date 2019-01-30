@@ -5,14 +5,20 @@ import psycopg2
 DBNAME = "news"
 
 
+try:
+    db = psycopg2.connect(database=DBNAME)
+except psycopg2.Error as e:
+    print("Unable to connect to the database")
+
+
 def main():
     format_output(topThree())
     format_output(topAuthor())
     format_output(onePercent())
+    db.close()
 
 
 def topThree():
-    db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
     query_question = "1. What are the most popular three articles of all time?"
     cursor.execute('''
@@ -25,11 +31,9 @@ def topThree():
         LIMIT 3;
         ''')
     return (cursor.fetchall(), query_question)
-    db.close()
 
 
 def topAuthor():
-    db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
     query_question = '''2. What are the most popular article authors of all
     time?'''
@@ -44,11 +48,9 @@ def topAuthor():
         ORDER BY count(log.path) DESC;
         ''')
     return (cursor.fetchall(), query_question)
-    db.close()
 
 
 def onePercent():
-    db = psycopg2.connect(database=DBNAME)
     cursor = db.cursor()
     query_question = '''3. On which days did more than 1% of requests lead to
     errors?'''
@@ -75,7 +77,6 @@ def onePercent():
           WHERE (num2::decimal  / (num1+num2)::decimal)*100 > 1;
          ''')
     return (cursor.fetchall(), query_question)
-    db.close()
 
 
 def format_output((arg1, arg2)):
