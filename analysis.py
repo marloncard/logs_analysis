@@ -19,9 +19,9 @@ def topThree():
         SELECT articles.title, count(log.path) || ' views' as num
         FROM articles
         JOIN log
-        ON log.path LIKE '%' || articles.slug || '%'
+        ON log.path LIKE '%' || articles.slug
         GROUP BY articles.title
-        ORDER BY num DESC
+        ORDER BY count(log.path) DESC
         LIMIT 3;
         ''')
     return (cursor.fetchall(), query_question)
