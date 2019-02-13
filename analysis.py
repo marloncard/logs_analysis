@@ -35,7 +35,7 @@ def topThree():
 
 def topAuthor():
     cursor = db.cursor()
-    query_question = '''2. What are the most popular article authors of all
+    query_question = '''2. Who are the most popular article authors of all
     time?'''
     cursor.execute('''
         SELECT authors.name, count(log.path) || ' views' as num
