@@ -15,6 +15,8 @@ The data is presented as being from a fictional news website. It provides inform
  * `articles` containing a list of articles written by each author
  * `log` shows access of each article over the course of a month as well as returned HTTP response codes (`200 OK`, `404 NOT FOUND`).
 
+ Download sample data [here](https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip).
+
 ## QUESTIONS
 1. What are the most popular three articles of all time? Which articles have been accessed the most? Present this information as a sorted list with the most popular article at the top.
 
